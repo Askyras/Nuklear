@@ -5524,6 +5524,7 @@ struct nk_popup_state {
 
 struct nk_edit_state {
     nk_hash name;
+    nk_hash prev_name;
     unsigned int seq;
     unsigned int old;
     int active, prev;
@@ -20202,6 +20203,7 @@ nk_panel_end(struct nk_context *ctx)
         window->edit.old = window->edit.seq;
         window->edit.prev = window->edit.active;
         window->edit.seq = 0;
+        window->edit.prev_name = window->edit.name;
     }
     /* contextual garbage collector */
     if (window->popup.active_con && window->popup.con_old != window->popup.con_count) {
@@ -28062,6 +28064,7 @@ nk_edit_buffer(struct nk_context *ctx, nk_flags flags,
 
     filter = (!filter) ? nk_filter_default: filter;
     prev_state = (unsigned char)edit->active;
+    edit->active = (unsigned char)(win->edit.active && hash == win->edit.prev_name);
     in = (flags & NK_EDIT_READ_ONLY) ? 0: in;
     ret_flags = nk_do_edit(&ctx->last_widget_state, &win->buffer, bounds, flags,
                     filter, edit, &style->edit, in, style->font);
